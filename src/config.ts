@@ -10,4 +10,5 @@ export const SITE = {
     "Sistem peminjaman adalah sebuah sistem yang digunakan untuk mengelola peminjaman di kampus.",
   applicationName: "Sistem Peminjaman",
   keywords: ["sistem", "peminjaman", "kelola", "peminjaman", "kampus"],
+  themeColor: "#F9F5EB",
 };
