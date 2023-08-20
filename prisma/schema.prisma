@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  externalId String     @unique
+  email      String
+  firstName  String
+  lastName   String
+  imageURL   String     @db.Text
+  metadata   Json
+  loanBook   LoanBook[]
+  LoanRoom   LoanRoom[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Book {
+  id         Int        @id @default(autoincrement())
+  coverImage String
+  judul      String
+  sinopsis   String     @db.LongText
+  tahun      Int
+  penerbit   String
+  penulis    String
+  stok       Int
+  category   Category   @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  location   BookLocation @relation(fields: [locationId], references: [id])
+  locationId Int
+  LoanBook   LoanBook[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model LoanBook {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [externalId])
+  userId    String
+  book      Book     @relation(fields: [bookId], references: [id])
+  bookId    Int
+  status    Statuses? @relation(fields: [statusId], references: [id])
+  statusId  Int       @default(1)
+  quantity  Int?
+  start     DateTime @default(now())
+  end       DateTime
+  isDone    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  books     Book[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BookLocation {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  books     Book[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Statuses {
+  id         Int        @id @default(autoincrement())
+  keterangan String     @unique
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  LoanBook   LoanBook[]
+  LoanRoom   LoanRoom[]
+}
+
+model Room {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  tersedia  Boolean    @default(true)
+  LoanRoom  LoanRoom[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model LoanRoom {
+  id         Int       @id @default(autoincrement())
+  user       User      @relation(fields: [userId], references: [externalId])
+  userId     String
+  room       Room      @relation(fields: [roomId], references: [id])
+  roomId     Int
+  Status     Statuses? @relation(fields: [statusId], references: [id])
+  statusId   Int       @default(1)
+  start      DateTime
+  end        DateTime
+  keterangan String    @db.Text
+  isDone     Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
